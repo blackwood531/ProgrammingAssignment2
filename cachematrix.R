@@ -4,31 +4,31 @@
 ## - get returns the matrix
 ## - set updates the matrix
 ## - getCachedProperty returns the property, if any, that has been cached with the matrix
-## - setCachedProperty sets the cached property
+## - setCachedProperty updates the cached property
 ##
-## cacheSolve computes the matrix' inverse and saves the result as the matrix' cached property
+## cacheSolve computes the matrix' inverse and saves the result as the cached property
 ## 
 ## makeCacheMatrix also provides a function called getInverse that I added because
 ## I'm not thrilled with the interface in the problem statement.
 ## The reason I'm not thrilled is that the setCachedValue function
-## can be called with any argument, by any code. The caller doesn't have to be
+## can be called by any code, with any argument. The caller doesn't have to be
 ## cacheSolve, and nothing compels the value to be the matrix' inverse.
-##
 ## If that happens, say as the result of a bug, the bad value could be used later
-## as if it were the inverse
-## That's why I called them getCachedProperty and setCachedProperty
-## instead of getInverse and setInverse because the cached property could be anything
+## as if it were the inverse. That's why I called the second getter/setter pair
+## getCachedProperty and setCachedProperty instead of getInverse and setInverse
+##
+## The fifth function is the one I added to the interface, to illustrate a
+## different approach that ensures that the cached inverse is actually an inverse
+## 
 ## - getInverse computes the matrix's inverse, if necessary, and caches it;
 ##       if the matrix was previously cached, getInverse returns it instead of computing it again
 ##       this has the advantage that it can be relied upon to return the matrix' inverse
-
 
 ## makeCacheMatrix returns a list of wrapper functions as described above
 ## It also saves the matrix passed as its argument. Since it saves the matrix in
 ## the same environment in which the wrapper functions are defined, they can work with
 ## the matrix and the cached property without clashing with anything else that's going on
 ## in the program
-
 makeCacheMatrix <- function(x = matrix()) {
     cachedProperty <- NULL
     inverse <- NULL
@@ -80,14 +80,14 @@ makeCacheMatrix <- function(x = matrix()) {
 }
 
 ## As described above, cacheSolve returns the matrix' cached property if there is one
-## If not, it computes 
-cacheSolve <- function(x, ...) {
-    inv <- x$getCachedProperty()
+## If not, it computes the inverse and saves it in the cached property
+cacheSolve <- function(cx, ...) {
+    inv <- cx$getCachedProperty()
     if( is.null(inv) ) {
-        inv <- solve(x, ...)
-        x$setCachedProperty(inv)
+        inv <- solve(cx$get(), ...)
+        cx$setCachedProperty(inv)
     } else {
-        message("using cached inverse")
+        message("using cached property, hoping it's the inverse")
     }
     inv
 }
